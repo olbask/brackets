@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    const empty = "<span>&nbsp;</span>"
+
+    function clear(el) {
+      el.innerHTML = empty
+      var cl = el.classList[1];
+      for (var e of document.getElementsByClassName(cl)) {
+        e.classList.remove('winner');
+      }
+    }
+
+    function toggle(el, nextel) {
+      if (el.innerHTML !== empty) {
+        var cl = el.classList[1];
+        for (var e of document.getElementsByClassName(cl)) {
+          e.classList.remove('winner');
+        }
+        el.classList.add('winner');
+        document.getElementById(nextel).innerHTML = el.innerHTML;
+      }
+    } 
+
+    document.addEventListener("DOMContentLoaded", function(e) {
+      
+      var prediction = {};
+      var btn = document.getElementById("btn")
+
+      btn.addEventListener("click", (e) => {
+        prediction["SEMIFINAL_1_1"] = document.getElementById("a12_1").textContent;
+        prediction["SEMIFINAL_1_2"] = document.getElementById("a12_2").textContent;
+        prediction["SEMIFINAL_2_1"] = document.getElementById("b12_1").textContent;
+        prediction["SEMIFINAL_2_2"] = document.getElementById("b12_2").textContent;
+        prediction["FINAL_1"] = document.getElementById("fin_1").textContent;
+        prediction["FINAL_2"] = document.getElementById("fin_2").textContent;
+        prediction["CHAMPION"] = document.getElementById("champ").textContent;
+        console.log(prediction)
+        btn.textContent = prediction
+
+        var canvas = document.getElementById("all");
+        var dataURL = canvas.toDataURL("image/png");
+        var newTab = window.open('about:blank','image from canvas');
+        newTab.document.write("<img src='" + dataURL + "' alt='from canvas'/>");
+      });
+
+      // Select the node that will be observed for mutations
+      const targetNode = Array.from(document.getElementsByClassName("participant"));
+
+      targetNode.forEach((target) => {
+        target.addEventListener("click", (event) => {
+          toggle(target, target.getAttribute("next"))
+      })});
+
+      // Options for the observer (which mutations to observe)
+      const config = { attributes: true, childList: true, subtree: true };
+
+      // Callback function to execute when mutations are observe
+      function callback(records) {
+        for (const record of records) {
+          var nxt = document.getElementById(record.target.getAttribute("next"));
+          if ((record.type === "childList") && (nxt.innerHTML !== empty)) {
+            clear(nxt);
+          }
+        }
+      }
+
+      // Create an observer instance linked to the callback function
+      const observer = new MutationObserver(callback);
+
+      // Start observing the target node for configured mutations
+      targetNode.forEach(function(node) {
+        observer.observe(node, config);
+      });
+    });
+  </script>
+</head>
+
+<body>
+
+<div class="bracket" id="all">
+  <section class="round quarterfinals">
+    <div class="winners">
+      <div class="matchups">
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant a1" id="a1_1" next="a12_1"><span>1</span></div>
+            <div class="participant a1" id="a1_2" next="a12_1"><span>2</span></div>
+          </div>
+        </div>
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant a2" id="a2_1" next="a12_2"><span>3</span></div>
+            <div class="participant a2" id="a2_2" next="a12_2"><span>4</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="connector">
+        <div class="merger"></div>
+        <div class="line"></div>
+      </div>
+    </div>
+    <div class="winners">
+      <div class="matchups">
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant b1" id="b1_1" next="b12_1"><span>5</span></div>
+            <div class="participant b1" id="b1_2" next="b12_1"><span>6</span></div>
+          </div>
+        </div>
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant b2" id="b2_1" next="b12_2"><span>7</span></div>
+            <div class="participant b2" id="b2_2" next="b12_2"><span>8</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="connector">
+        <div class="merger"></div>
+        <div class="line"></div>
+      </div>
+    </div>
+  </section>
+  <section class="round semifinals">
+    <div class="winners">
+      <div class="matchups">
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant a12" id="a12_1" next="fin_1"><span>&nbsp;</span></div>
+            <div class="participant a12" id="a12_2" next="fin_1"><span>&nbsp;</span></div>
+          </div>
+        </div>
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant b12" id="b12_1" next="fin_2"><span>&nbsp;</span></div>
+            <div class="participant b12" id="b12_2" next="fin_2"><span>&nbsp;</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="connector">
+        <div class="merger"></div>
+        <div class="line"></div>
+      </div>
+    </div>
+  </section>
+  <section class="round finals">
+    <div class="winners">
+      <div class="matchups">
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant fin" id="fin_1" next="champ"><span>&nbsp;</span></div>
+            <div class="participant fin" id="fin_2" next="champ"><span>&nbsp;</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="round champion">
+    <div class="winners">
+      <div class="connector">
+        <div class="merger"></div>
+        <div class="line"></div>
+      </div>      
+      <div class="matchups">
+        <div class="matchup">
+          <div class="participants">
+            <div class="participant" id="champ" next="None"><span>&nbsp;</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<div><input type="button" id="btn" value="SAVE"></div>
+</body>
+</html>
